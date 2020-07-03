@@ -237,6 +237,9 @@ public class PhotosActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if(selected_state){
+            Intent intent = getIntent();
+            finish();
+            startActivity(intent);
             selectAll.setVisibility(View.INVISIBLE);
             selected_state = false;
             for(int i=0;i<list.size();i++)
@@ -244,7 +247,7 @@ public class PhotosActivity extends AppCompatActivity {
             recyclerView.setLayoutManager(new GridLayoutManager(PhotosActivity.this,3));
             photoAdapter = new PhotoAdapter(this,list);
             recyclerView.setAdapter(photoAdapter);
-            this.recreate();
+
         }else{
             /*Intent intent = new Intent(PhotosActivity.this,AlbumActivity.class);
             startActivity(intent);

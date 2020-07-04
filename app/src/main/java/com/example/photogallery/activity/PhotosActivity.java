@@ -2,12 +2,16 @@ package com.example.photogallery.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -178,6 +182,7 @@ public class PhotosActivity extends AppCompatActivity {
     }*/
 
     public void saveImages(){
+
         Bitmap bitmap = null;
         File path = Environment.getExternalStorageDirectory();
 
@@ -192,13 +197,13 @@ public class PhotosActivity extends AppCompatActivity {
             while (i<list.size()) {
 
                 if(list.get(i).getIs_selected().equals("1")){
-                    File dir = new File(path + "/" + album + "from");
+                    File dir = new File(path + "/Download");
                     System.out.println("Dir .. " + dir);
                     dir.mkdirs();
                     bitmap = list.get(i).getImage();
                     String time = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(System.currentTimeMillis());
 
-                    String imageName = String.valueOf(i) + ".JPEG";
+                    String imageName = album+String.valueOf(i) + ".JPEG";
                     File file = new File(dir, imageName);
                     OutputStream outputStream;
                     try {
@@ -214,9 +219,16 @@ public class PhotosActivity extends AppCompatActivity {
 
             }
             Toast.makeText(PhotosActivity.this,"Downloading...!",Toast.LENGTH_SHORT).show();
+
+            if(count==1)
+                sendNotification(count+" Image Downloaded");
+            else
+                sendNotification(count+" Images Downloaded");
         }else{
             Toast.makeText(PhotosActivity.this,"No item selected..!",Toast.LENGTH_SHORT).show();
         }
+
+
 
     }
 
@@ -255,4 +267,23 @@ public class PhotosActivity extends AppCompatActivity {
             super.onBackPressed();
         }
     }
+
+    public void sendNotification(String content){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel channel = new NotificationChannel("MyNotifications","MyNotifications", NotificationManager.IMPORTANCE_DEFAULT);
+
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(PhotosActivity.this,"MyNotifications")
+                .setContentTitle("AcadFlip")
+                .setSmallIcon(R.drawable.acadflip)
+                .setAutoCancel(true)
+                .setContentText(content);
+
+        NotificationManagerCompat managerCompat = NotificationManagerCompat.from(PhotosActivity.this);
+        managerCompat.notify(999,builder.build());
+    }
+
 }
